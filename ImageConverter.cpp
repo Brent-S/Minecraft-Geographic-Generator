@@ -79,27 +79,13 @@ int main( int /*argc*/, char ** argv)
 		size_t cols = picture.columns();
 		size_t rows = picture.rows();
 
-//		const PixelPacket *pixelPacket = picture.getConstPixels(0,0,cols,rows);
-//
-//		cout << "Begin image output:\n";
-//		for(unsigned int r = 0; r < picture.baseRows(); r++){
-//			for(unsigned int c = 0; c < picture.baseColumns(); c++){
-//				unsigned int i = r + c * picture.baseColumns(); // TODO check this is right with larger image
-//
-//				PixelPacket pixel = pixelPacket[i];
-//				cout << pixel.red << "\t" << pixel.blue << "\t" << pixel.green << "\n";
-//
-//
-//			}
-//			cout << "\n";
-//		}
-
 		const PixelPacket *pixels = picture.getConstPixels(0,0,cols,rows);
 		cout << "Begin image output:\n";
-		for(unsigned int c = 0; c < picture.baseColumns(); c++){
-			for(unsigned int r = 0; r < picture.baseRows(); r++){
-				unsigned int i = r + c * picture.baseColumns(); // TODO check this is right with larger image
+		int i = 0;
+		for(unsigned int r = 0; r < picture.baseRows(); r++){
+			for(unsigned int c = 0; c < picture.baseColumns(); c++){
 				cout << (pixels+i)->red << "\t" << (pixels+i)->green << "\t"<< (pixels+i)->blue << "\n";
+				i++;
 			}
 			cout << "\n";
 		}
