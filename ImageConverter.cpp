@@ -65,8 +65,12 @@ vector<ColourRangeToBlock> ReadBlockDefs(){
 	return ranges;
 }
 
-int main( int /*argc*/, char ** argv)
-{
+int main( int /*argc*/, char ** argv) {
+
+	// Reads in colour definitions from ImageConverter.conf and prints to standard out a
+	// tab-delimited list of comma-separated (BlockID,DamageValue) pairs, with a newline
+	// for each row of pixels.
+
 	InitializeMagick(*argv);
 	try {
 
@@ -80,11 +84,24 @@ int main( int /*argc*/, char ** argv)
 		size_t rows = picture.rows();
 
 		const PixelPacket *pixels = picture.getConstPixels(0,0,cols,rows);
-		cout << "Begin image output:\n";
-		int i = 0;
+		// cout << "Begin image output:\n";
+		int i = 0; // pixel iterator
 		for(unsigned int r = 0; r < picture.baseRows(); r++){
 			for(unsigned int c = 0; c < picture.baseColumns(); c++){
-				cout << (pixels+i)->red << "\t" << (pixels+i)->green << "\t"<< (pixels+i)->blue << "\n";
+				// cout << (pixels+i)->red << "\t" << (pixels+i)->green << "\t"<< (pixels+i)->blue << "\n";
+
+				// Next, test current pixel against vector BlockDefs, and get BlockID and DamageValue from fist match.
+				int BlockID = -1;
+				int DamageValue = -1;
+				for(size_t j = 0; j < BlockDefs.size(); j++){
+					ColourRangeToBlock CurrentBlockDef = BlockDefs.at(j);
+					if(CurrentBlockDef.testRGB((pixels+i)->red, (pixels+i)->green, (pixels+i)->blue)){
+						BlockID = CurrentBlockDef.getBlockID();
+						DamageValue = CurrentBlockDef.getDamageValue();
+						break;
+					}
+				}
+				cout << BlockID << "," << DamageValue << "\t";
 				i++;
 			}
 			cout << "\n";
