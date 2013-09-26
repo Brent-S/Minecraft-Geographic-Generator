@@ -38,6 +38,8 @@ vector<ColourRangeToBlock> ReadBlockDefs(){
 	{
 		if(nxtLine.at(0) == '#'){
 			// Do nothing. Line is a comment and should be ignored.
+		} else if(nxtLine.compare(0, 6, "image=") == 0) {
+			// Do nothing. Line is the image to be read.
 		} else {
 			vector<string> BrokenLine = split(nxtLine,"\t");
 
@@ -62,7 +64,27 @@ vector<ColourRangeToBlock> ReadBlockDefs(){
 		}
 		getline(ConfigFile,nxtLine);
 	}
+	ConfigFile.close();
 	return ranges;
+}
+
+Image ReadInputImage(){
+	Image output;
+	ifstream ConfigFile("ImageConverter.conf");
+	string nxtLine;
+	getline(ConfigFile,nxtLine);
+	while (ConfigFile.good())
+	{
+		if(nxtLine.compare(0, 6, "image=") == 0) {
+			output.read(nxtLine.substr(6));
+			break;
+		} else {
+			// Do nothing. Line is not an image input.
+		}
+		getline(ConfigFile,nxtLine);
+	}
+	ConfigFile.close();
+	return output;
 }
 
 int main( int /*argc*/, char ** argv) {
@@ -73,12 +95,8 @@ int main( int /*argc*/, char ** argv) {
 
 	InitializeMagick(*argv);
 	try {
-
 		vector<ColourRangeToBlock> BlockDefs = ReadBlockDefs();
-
-		// Read test image, just to have some pixels available
-		Image picture;
-		picture.read("TestImage1.png");
+		Image picture = ReadInputImage();
 
 		size_t cols = picture.columns();
 		size_t rows = picture.rows();
