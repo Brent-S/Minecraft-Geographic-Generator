@@ -36,12 +36,8 @@ vector<ColourRangeToBlock> ReadBlockDefs(){
 	getline(ConfigFile,nxtLine);
 	while (ConfigFile.good())
 	{
-		if(nxtLine.at(0) == '#'){
-			// Do nothing. Line is a comment and should be ignored.
-		} else if(nxtLine.compare(0, 6, "image=") == 0) {
-			// Do nothing. Line is the image to be read.
-		} else {
-			vector<string> BrokenLine = split(nxtLine,"\t");
+		if(nxtLine.compare(0, 6, "block=") == 0) {
+			vector<string> BrokenLine = split(nxtLine.substr(6),"\t");
 
 			vector<string>::iterator n = BrokenLine.begin();
 			MinRed = strtod((*n).c_str(),NULL);
@@ -61,6 +57,8 @@ vector<ColourRangeToBlock> ReadBlockDefs(){
 			DamageValue = atoi((*n).c_str());
 
 			ranges.push_back(ColourRangeToBlock(MinRed, MaxRed, MinGreen, MaxGreen, MinBlue, MaxBlue, BlockID, DamageValue));
+		} else {
+			//Do nothing.  Line is not a block definition.
 		}
 		getline(ConfigFile,nxtLine);
 	}
@@ -87,6 +85,25 @@ Image ReadInputImage(){
 	return output;
 }
 
+double ReadScale(){
+	double output;
+	ifstream ConfigFile("ImageConverter.conf");
+	string nxtLine;
+	getline(ConfigFile,nxtLine);
+	while (ConfigFile.good())
+	{
+		if(nxtLine.compare(0, 6, "scale=") == 0) {
+			output=strtod((nxtLine.substr(6)).c_str(),NULL);
+			break;
+		} else {
+			// Do nothing. Line is not a scale definition.
+		}
+		getline(ConfigFile,nxtLine);
+	}
+	ConfigFile.close();
+	return output;
+}
+
 int main( int /*argc*/, char ** argv) {
 
 	// Reads in colour definitions from ImageConverter.conf and prints to standard out a
@@ -97,15 +114,26 @@ int main( int /*argc*/, char ** argv) {
 	try {
 		vector<ColourRangeToBlock> BlockDefs = ReadBlockDefs();
 		Image picture = ReadInputImage();
+		double scale = ReadScale();
 
 		size_t cols = picture.columns();
 		size_t rows = picture.rows();
 
+		if(scale != 1) {
+			picture.modifyImage();
+			int NewCols = cols / ((int)scale); // width
+			int NewRows = rows / ((int)scale); // height
+			picture.resize(Geometry(NewCols,NewRows));
+			cols = picture.columns();
+			rows = picture.rows();
+			picture.write("test.png");
+		}
+
 		const PixelPacket *pixels = picture.getConstPixels(0,0,cols,rows);
 		// cout << "Begin image output:\n";
 		int i = 0; // pixel iterator
-		for(unsigned int r = 0; r < picture.baseRows(); r++){
-			for(unsigned int c = 0; c < picture.baseColumns(); c++){
+		for(unsigned int r = 0; r < rows; r++){
+			for(unsigned int c = 0; c < cols; c++){
 				// cout << (pixels+i)->red << "\t" << (pixels+i)->green << "\t"<< (pixels+i)->blue << "\n";
 
 				// Next, test current pixel against vector BlockDefs, and get BlockID and DamageValue from fist match.
