@@ -153,7 +153,6 @@ int main( int /*argc*/, char ** argv) {
 			cout << "\n";
 		}
 
-
 	} catch( Exception &error_ ) {
 		cout << "Caught Exception: " << error_.what() << endl;
 		return 1;
