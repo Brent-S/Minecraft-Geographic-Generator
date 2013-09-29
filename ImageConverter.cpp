@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "ColourRangeToBlock.h"
+#include "NBTTagNew.h"
 
 using namespace std;
 using namespace Magick;
@@ -104,7 +105,7 @@ double ReadScale(){
 	return output;
 }
 
-int main( int /*argc*/, char ** argv) {
+int DoPictureStuff( int /*argc*/, char ** argv) {
 
 	// Reads in colour definitions from ImageConverter.conf and prints to standard out a
 	// tab-delimited list of comma-separated (BlockID,DamageValue) pairs, with a newline
@@ -161,6 +162,22 @@ int main( int /*argc*/, char ** argv) {
 		return 1;
 	}
 
+	return 0;
+}
+
+
+int main( int /*argc*/, char ** argv) {
+	cout << "Enter 1 to do image stuff, or 2 to read test nbt file:\n";
+	int inputNum;
+	cin >> inputNum;
+
+	if(inputNum == 1){
+		return DoPictureStuff(0, argv);  // dunno what the call really is...
+	} else {
+		ifstream inFile("hello_world.nbt");
+		NBTTag rootTag = NBTTag(ifstream);
+		cout << rootTag.getDisplayString();
+	}
 	return 0;
 }
 
