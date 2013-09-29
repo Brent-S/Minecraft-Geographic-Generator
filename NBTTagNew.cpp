@@ -21,7 +21,7 @@ public:
 	TagPayloadByte(char inChar){
 		payload = inChar;
 	}
-	TagPayloadByte(istream inStream){
+	TagPayloadByte(istream& inStream){
 		payload = inStream.get();
 	}
 	string getDisplayString(){
@@ -41,7 +41,7 @@ public:
 	TagPayloadShort(short inShort){
 		payload = inShort;
 	}
-	TagPayloadShort(istream inStream){
+	TagPayloadShort(istream& inStream){
 		short inShort;
 		inStream >> inShort;
 		payload = EndianSwapShort(inShort);
@@ -67,7 +67,7 @@ public:
 	TagPayloadInt(int inInt){
 		payload = inInt;
 	}
-	TagPayloadInt(istream inStream){
+	TagPayloadInt(istream& inStream){
 		int inInt;
 		inStream >> inInt;
 		payload = EndianSwapInt(inInt);
@@ -93,7 +93,7 @@ public:
 	TagPayloadLong(long inLong){
 		payload = inLong;
 	}
-	TagPayloadLong(istream inStream){
+	TagPayloadLong(istream& inStream){
 		long inLong;
 		inStream >> inLong;
 		payload = EndianSwapLong(inLong);
@@ -119,7 +119,7 @@ public:
 	TagPayloadFloat(float inFloat){
 		payload = inFloat;
 	}
-	TagPayloadFloat(istream inStream){
+	TagPayloadFloat(istream& inStream){
 		float inFloat;
 		inStream >> inFloat;
 		payload = EndianSwapFloat(inFloat);
@@ -145,7 +145,7 @@ public:
 	TagPayloadDouble(double inDouble){
 		payload = inDouble;
 	}
-	TagPayloadDouble(istream inStream){
+	TagPayloadDouble(istream& inStream){
 		double inDouble;
 		inStream >> inDouble;
 		payload = EndianSwapDouble(inDouble);
@@ -175,7 +175,7 @@ public:
 			payload[i] = inArray[i];
 		}
 	}
-	TagPayloadByteArray(istream inStream){
+	TagPayloadByteArray(istream& inStream){
 		int inLength;
 		inStream >> inLength;
 		length = EndianSwapInt(inLength);
@@ -213,7 +213,7 @@ public:
 	TagPayloadString(string inString){
 		payload = inString;
 	}
-	TagPayloadString(istream inStream){
+	TagPayloadString(istream& inStream){
 		int length;
 		inStream >> length;
 		char* inString = new char[length];
@@ -287,7 +287,7 @@ public:
 			payload[i] = inArray[i];
 		}
 	}
-	TagPayloadIntArray(istream inStream){
+	TagPayloadIntArray(istream& inStream){
 		int inLength;
 		inStream >> inLength;
 		length = EndianSwapInt(inLength);
@@ -324,7 +324,7 @@ private:
 	TagPayload* Payload; // Need to be careful about this.
 
 public:
-	NBTTag(istream inStream){
+	NBTTag(istream& inStream){
 		char inType;
 		inStream >> inType;
 		TagType = static_cast<TAG_TypeID>(inType);
@@ -349,7 +349,7 @@ public:
 	void addTag(NBTTag inTag){
 		payload.push_back(inTag);
 	}
-	TagPayloadCompound(istream inStream){
+	TagPayloadCompound(istream& inStream){
 		char nxtByte = inStream.peek();
 		while(static_cast<TAG_TypeID>(nxtByte) != TAG_End){
 			payload.push_back(NBTTag(inStream));

@@ -55,7 +55,7 @@ private:
 	char payload;
 public:
 	TagPayloadByte(char inChar);
-	TagPayloadByte(istream inStream);
+	TagPayloadByte(istream& inStream);
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -65,7 +65,7 @@ private:
 	short payload;
 public:
 	TagPayloadShort(short inShort);
-	TagPayloadShort(istream inStream);
+	TagPayloadShort(istream& inStream);
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -75,7 +75,7 @@ private:
 	int payload;
 public:
 	TagPayloadInt(int inInt);
-	TagPayloadInt(istream inStream);
+	TagPayloadInt(istream& inStream);
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -85,7 +85,7 @@ private:
 	long payload;
 public:
 	TagPayloadLong(long inLong);
-	TagPayloadLong(istream inStream);
+	TagPayloadLong(istream& inStream);
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -95,7 +95,7 @@ private:
 	float payload;
 public:
 	TagPayloadFloat(float inFloat);
-	TagPayloadFloat(istream inStream);
+	TagPayloadFloat(istream& inStream);
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -105,7 +105,7 @@ private:
 	double payload;
 public:
 	TagPayloadDouble(double inDouble);
-	TagPayloadDouble(istream inStream);
+	TagPayloadDouble(istream& inStream);
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -116,7 +116,7 @@ private:
 	int length;
 public:
 	TagPayloadByteArray(char* inArray, int inLength);
-	TagPayloadByteArray(istream inStream);
+	TagPayloadByteArray(istream& inStream);
 	string getDisplayString();
 	iostream getStorageBytes();
 	~TagPayloadByteArray();
@@ -127,7 +127,7 @@ private:
 	string payload;
 public:
 	TagPayloadString(string inString);
-	TagPayloadString(istream inStream);
+	TagPayloadString(istream& inStream);
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -139,7 +139,7 @@ private:
 public:
 	TagPayloadList(TAG_TypeID inType);
 	void addPayload(TagPayload* inPayload);
-	TagPayloadList(istream inStream);
+	TagPayloadList(istream& inStream);
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -150,7 +150,7 @@ private:
 	int length; // number of ints, not bytes.
 public:
 	TagPayloadIntArray(int* inArray, int inLength);
-	TagPayloadIntArray(istream inStream);
+	TagPayloadIntArray(istream& inStream);
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -161,7 +161,7 @@ private:
 	TagPayloadString name;
 	TagPayload* Payload; // Need to be careful about this.
 public:
-	NBTTag(istream inStream);
+	NBTTag(istream& inStream);
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -172,14 +172,14 @@ private:
 	vector<NBTTag> payload;
 public:
 	void addTag(NBTTag inTag);
-	TagPayloadCompound(istream inStream);
+	TagPayloadCompound(istream& inStream);
 	string getDisplayString();
 	iostream getStorageBytes();
 };
 
 // I DO know that the rest IS necessary.
 
-TagPayload * getPayloadFromStream(TAG_TypeID inType, istream inStream){		// TODO check whether the polymorphism works here
+TagPayload * getPayloadFromStream(TAG_TypeID inType, istream& inStream){		// TODO check whether the polymorphism works here
 																			 //or if pointers are needed...
 		switch (inType)
 		{
@@ -211,7 +211,7 @@ TagPayload * getPayloadFromStream(TAG_TypeID inType, istream inStream){		// TODO
 		return (TagPayload *) NULL;
 }
 
-TagPayload * getPayloadFromStream(int inType, istream inStream){
+TagPayload * getPayloadFromStream(int inType, istream& inStream){
 	TAG_TypeID changed = static_cast<TAG_TypeID>(inType);
 	return getPayloadFromStream(changed, inStream);
 }
