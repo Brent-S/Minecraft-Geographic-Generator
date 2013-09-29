@@ -175,7 +175,7 @@ int main( int /*argc*/, char ** argv) {
 		return DoPictureStuff(0, argv);  // dunno what the call really is...
 	} else {
 		ifstream inFile("hello_world.nbt");
-		NBTTag rootTag = NBTTag(ifstream);
+		NBTTag rootTag (inFile);
 		cout << rootTag.getDisplayString();
 	}
 	return 0;

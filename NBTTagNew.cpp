@@ -11,7 +11,7 @@ class TagPayload {
 public:
 	virtual string getDisplayString() =0;	// TODO Need to check how polymorphic inheritance works
 	virtual iostream getStorageBytes() =0;
-	virtual ~TagPayload();					// I hope this is correct...
+	virtual ~TagPayload();	// I hope this is correct...
 };
 
 class TagPayloadByte : public TagPayload {
@@ -179,7 +179,7 @@ public:
 		int inLength;
 		inStream >> inLength;
 		length = EndianSwapInt(inLength);
-		payload = new char[length];		// I don't know if it's necessary to check that this allocation has worked.
+		payload = new char[length];	// I don't know if it's necessary to check that this allocation has worked.
 		for(int i = 0; i < length; i++){
 			inStream >> payload[i];
 		}
@@ -202,7 +202,7 @@ public:
 		return out;
 	}
 	~TagPayloadByteArray(){
-		delete [] payload;			// I think this is right...
+		delete [] payload;	// I think this is right...
 	}
 };
 
@@ -226,7 +226,7 @@ public:
 		return payload;
 	}
 	iostream getStorageBytes(){
-		unsigned short shortLength = (unsigned short) payload.size();  // This is right (I think) due to the weirdness of NBT
+		unsigned short shortLength = (unsigned short) payload.size(); // This is right (I think) due to the weirdness of NBT
 		iostream out;
 		out << EndianSwapShort(shortLength) << payload;
 		return out;
@@ -251,7 +251,7 @@ public:
 		inStream >> inLength;
 		int length = EndianSwapInt(inLength);
 		for(int i = 0; i < length; i++){
-			payload.push_back(getPayloadFromStream(inType,inStream));
+			payload.push_back(*getPayloadFromStream(inType,inStream));
 		}
 	}
 	string getDisplayString(){
@@ -291,7 +291,7 @@ public:
 		int inLength;
 		inStream >> inLength;
 		length = EndianSwapInt(inLength);
-		payload = new int[length];		// I don't know if it's necessary to check that this allocation has worked.
+		payload = new int[length];	// I don't know if it's necessary to check that this allocation has worked.
 		for(int i = 0; i < length; i++){
 			int temp;
 			inStream >> temp;

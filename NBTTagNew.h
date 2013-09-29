@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <memory>
 
 using namespace std;
 
@@ -178,39 +179,39 @@ public:
 
 // I DO know that the rest IS necessary.
 
-TagPayload getPayloadFromStream(TAG_TypeID inType, istream inStream){		// TODO check whether the polymorphism works here
-																			// or if pointers are needed...
+TagPayload * getPayloadFromStream(TAG_TypeID inType, istream inStream){		// TODO check whether the polymorphism works here
+																			 //or if pointers are needed...
 		switch (inType)
 		{
-		case TAG_End: return NULL;
+		case TAG_End: return (TagPayload *) NULL;
 		break;
-		case TAG_Byte: return TagPayloadByte(inStream);
+		case TAG_Byte: return new TagPayloadByte(inStream);
 		break;
-		case TAG_Short: return TagPayloadShort(inStream);
+		case TAG_Short: return new TagPayloadShort(inStream);
 		break;
-		case TAG_Int: return TagPayloadInt(inStream);
+		case TAG_Int: return new TagPayloadInt(inStream);
 		break;
-		case TAG_Long: return TagPayloadLong(inStream);
+		case TAG_Long: return new TagPayloadLong(inStream);
 		break;
-		case TAG_Float: return TagPayloadFloat(inStream);
+		case TAG_Float: return new TagPayloadFloat(inStream);
 		break;
-		case TAG_Double: return TagPayloadDouble(inStream);
+		case TAG_Double: return new TagPayloadDouble(inStream);
 		break;
-		case TAG_Byte_Array: return TagPayloadByteArray(inStream);
+		case TAG_Byte_Array: return new TagPayloadByteArray(inStream);
 		break;
-		case TAG_String: return TagPayloadString(inStream);
+		case TAG_String: return new TagPayloadString(inStream);
 		break;
-		case TAG_List: return TagPayloadList(inStream);
+		case TAG_List: return new TagPayloadList(inStream);
 		break;
-		case TAG_Compound: return TagPayloadCompound(inStream);
+		case TAG_Compound: return new TagPayloadCompound(inStream);
 		break;
-		case TAG_IntArray: return TagPayloadIntArray(inStream);
+		case TAG_IntArray: return new TagPayloadIntArray(inStream);
 		break;
 		}
-		return NULL;
+		return (TagPayload *) NULL;
 }
 
-TagPayload getPayloadFromStream(int inType, istream inStream){
+TagPayload * getPayloadFromStream(int inType, istream inStream){
 	TAG_TypeID changed = static_cast<TAG_TypeID>(inType);
 	return getPayloadFromStream(changed, inStream);
 }
