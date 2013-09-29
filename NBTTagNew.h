@@ -2,7 +2,6 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <memory>
 
 using namespace std;
 
@@ -40,8 +39,6 @@ string TAGTypeToString(TAG_TypeID inID){
 	}
 	return out;
 }
-
-// I do not know if the following signature definition thingies are necessary (or even compile...)
 
 class TagPayload {
 public:
@@ -134,7 +131,7 @@ public:
 
 class TagPayloadList : public TagPayload {
 private:
-	vector<TagPayload> payload;
+	vector<TagPayload*> payload;
 	TAG_TypeID type;
 public:
 	TagPayloadList(TAG_TypeID inType);
@@ -157,7 +154,7 @@ public:
 
 class NBTTag {
 private:
-	const TAG_TypeID TagType;
+	TAG_TypeID TagType;
 	TagPayloadString name;
 	TagPayload* Payload; // Need to be careful about this.
 public:
