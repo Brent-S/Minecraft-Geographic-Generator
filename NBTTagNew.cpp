@@ -8,6 +8,11 @@
 using namespace std;
 
 
+TagPayload::~TagPayload(){
+
+}
+
+
 TagPayloadByte::TagPayloadByte(char inChar){
 	payload = inChar;
 }
@@ -161,6 +166,7 @@ TagPayloadDouble * TagPayloadDouble::clone(){
 
 TagPayloadByteArray::TagPayloadByteArray(char* inArray, int inLength){
 	length = inLength;
+	payload = new char[length];
 	for(int i = 0; i < length; i++){
 		payload[i] = inArray[i];
 	}
@@ -243,11 +249,12 @@ void TagPayloadList::addPayload(TagPayload* inPayload){
 TagPayloadList::TagPayloadList(istream& inStream){
 	char inType;
 	inStream >> inType;
+	type = static_cast<TAG_TypeID>(inType);
 	int inLength;
 	inStream >> inLength;
 	int length = EndianSwapInt(inLength);
 	for(int i = 0; i < length; i++){
-		payload.push_back(getPayloadFromStream(inType,inStream));
+		payload.push_back(getPayloadFromStream(type,inStream));
 	}
 }
 string TagPayloadList::getDisplayString(){
@@ -282,6 +289,7 @@ TagPayloadList * TagPayloadList::clone(){
 
 TagPayloadIntArray::TagPayloadIntArray(int* inArray, int inLength){
 	length = inLength;
+	payload = new int[length];
 	for(int i = 0; i < length; i++){
 		payload[i] = inArray[i];
 	}
@@ -321,6 +329,9 @@ TagPayloadIntArray * TagPayloadIntArray::clone(){
 	TagPayloadIntArray* out = new TagPayloadIntArray(newArray, newLength);
 	delete [] newArray; // TODO check this
 	return out;
+}
+TagPayloadIntArray::~TagPayloadIntArray(){
+	delete [] payload;
 }
 
 
@@ -363,6 +374,9 @@ TagPayloadCompound::TagPayloadCompound(istream& inStream){
 		nxtByte = inStream.peek();
 	}
 }
+TagPayloadCompound::TagPayloadCompound(){
+
+}
 string TagPayloadCompound::getDisplayString(){
 	stringstream ss;
 	string out;
@@ -378,6 +392,24 @@ void TagPayloadCompound::getStorageBytes(iostream& inStream){
 	}
 	inStream << '0'; // TAG_End
 }
+void TagPayloadCompound::addManyTags(vector<NBTTag>& inVector){
+
+}
+
+TagPayloadCompound * TagPayloadCompound::clone(){
+	TagPayloadCompound* out = new TagPayloadCompound;
+	out->addManyTags(payload);
+	return out;
+}
+
+
+
+
+
+
+
+
+
 
 TagPayload * getPayloadFromStream(TAG_TypeID inType, istream& inStream){		// TODO check whether the polymorphism works here
 																			 //or if pointers are needed...
@@ -411,10 +443,12 @@ TagPayload * getPayloadFromStream(TAG_TypeID inType, istream& inStream){		// TOD
 		return (TagPayload *) NULL;
 }
 
-TagPayload * getPayloadFromStream(int inType, istream& inStream){
-	TAG_TypeID changed = static_cast<TAG_TypeID>(inType);
-	return getPayloadFromStream(changed, inStream);
-}
+//TagPayload * getPayloadFromStream(int inType, istream& inStream){
+//	TAG_TypeID changed = static_cast<TAG_TypeID>(inType);
+//	return getPayloadFromStream(changed, inStream);
+//}
+
+
 
 string TAGTypeToString(TAG_TypeID inID){
 	string out = "UNKNOWN";

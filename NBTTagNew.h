@@ -15,9 +15,7 @@ public:
 	virtual string getDisplayString() = 0;	// TODO Need to check how polymorphic inheritance works
 	virtual void getStorageBytes(iostream& inStream) = 0;
 	virtual TagPayload * clone() = 0;
-	virtual ~TagPayload() {					// I hope this is correct...
-
-	}
+	virtual ~TagPayload();
 };
 
 class TagPayloadByte : public TagPayload {
@@ -152,7 +150,6 @@ private:
 	TagPayload* Payload; // Need to be careful about this.
 public:
 	NBTTag(istream& inStream);
-	//NBTTag(NBTTag& inTag);
 	TagPayloadString nameClone();
 	string getDisplayString();
 	void getStorageBytes(iostream& inStream);
@@ -165,7 +162,9 @@ private:
 	vector<NBTTag> payload;
 public:
 	void addTag(NBTTag inTag);
+	TagPayloadCompound();
 	TagPayloadCompound(istream& inStream);
+	void addManyTags(vector<NBTTag>& inVector);
 	TagPayloadCompound * clone();
 	string getDisplayString();
 	void getStorageBytes(iostream& inStream);
@@ -175,4 +174,4 @@ public:
 // I DO know that the rest IS necessary.
 
 TagPayload * getPayloadFromStream(TAG_TypeID inType, istream& inStream);
-TagPayload * getPayloadFromStream(int inType, istream& inStream);
+//TagPayload * getPayloadFromStream(int inType, istream& inStream);
