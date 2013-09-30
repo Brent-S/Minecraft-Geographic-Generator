@@ -21,10 +21,10 @@ string TagPayloadByte::getDisplayString(){
 	ss >> out;
 	return out;		// TODO does this work reference wise?
 }
-iostream TagPayloadByte::getStorageBytes(){
-	stringstream out;
-	out << payload;
-	return out;
+void TagPayloadByte::getStorageBytes(iostream& inStream){
+	//stringstream out;
+	inStream << payload;
+	//return out;
 }
 
 TagPayloadByte * TagPayloadByte::clone(){
@@ -49,10 +49,8 @@ string TagPayloadShort::getDisplayString(){
 	ss >> out;
 	return out;
 }
-iostream TagPayloadShort::getStorageBytes(){
-	stringstream out;
-	out << EndianSwapShort(payload);
-	return out;
+void TagPayloadShort::getStorageBytes(iostream& inStream){
+	inStream << EndianSwapShort(payload);
 }
 
 TagPayloadShort * TagPayloadShort::clone(){
@@ -76,10 +74,8 @@ string TagPayloadInt::getDisplayString(){
 	ss >> out;
 	return out;
 }
-iostream TagPayloadInt::getStorageBytes(){
-	stringstream out;
-	out << EndianSwapInt(payload);
-	return out;
+void TagPayloadInt::getStorageBytes(iostream& inStream){
+	inStream << EndianSwapInt(payload);
 }
 TagPayloadInt * TagPayloadInt::clone(){
 	return new TagPayloadInt(payload);
@@ -103,10 +99,8 @@ string TagPayloadLong::getDisplayString(){
 	ss >> out;
 	return out;
 }
-iostream TagPayloadLong::getStorageBytes(){
-	stringstream out;
-	out << EndianSwapLong(payload);
-	return out;
+void TagPayloadLong::getStorageBytes(iostream& inStream){
+	inStream << EndianSwapLong(payload);
 }
 TagPayloadLong * TagPayloadLong::clone(){
 	return new TagPayloadLong(payload);
@@ -129,10 +123,8 @@ string TagPayloadFloat::getDisplayString(){
 	ss >> out;
 	return out;
 }
-iostream TagPayloadFloat::getStorageBytes(){
-	stringstream out;
-	out << EndianSwapFloat(payload);
-	return out;
+void TagPayloadFloat::getStorageBytes(iostream& inStream){
+	inStream << EndianSwapFloat(payload);
 }
 TagPayloadFloat * TagPayloadFloat::clone(){
 	return new TagPayloadFloat(payload);
@@ -156,10 +148,8 @@ string TagPayloadDouble::getDisplayString(){
 	ss >> out;
 	return out;
 }
-iostream TagPayloadDouble::getStorageBytes(){
-	stringstream out;
-	out << EndianSwapDouble(payload);
-	return out;
+void TagPayloadDouble::getStorageBytes(iostream& inStream){
+	inStream << EndianSwapDouble(payload);
 }
 TagPayloadDouble * TagPayloadDouble::clone(){
 	return new TagPayloadDouble(payload);
@@ -192,13 +182,11 @@ string TagPayloadByteArray::getDisplayString(){
 	OutStream >> out;
 	return out;
 }
-iostream TagPayloadByteArray::getStorageBytes(){
-	stringstream out;
-	out << EndianSwapInt(length);
+void TagPayloadByteArray::getStorageBytes(iostream& inStream){
+	inStream << EndianSwapInt(length);
 	for(int i = 0; i < length; i++){
-		out << payload[i];
+		inStream << payload[i];
 	}
-	return out;
 }
 TagPayloadByteArray::~TagPayloadByteArray(){
 	delete [] payload;	// I think this is right...
@@ -232,11 +220,9 @@ TagPayloadString::TagPayloadString(istream& inStream){
 string TagPayloadString::getDisplayString(void){
 	return payload;
 }
-iostream TagPayloadString::getStorageBytes(){
+void TagPayloadString::getStorageBytes(iostream& inStream){
 	unsigned short shortLength = (unsigned short) payload.size(); // This is right (I think) due to the weirdness of NBT
-	stringstream out;
-	out << EndianSwapShort(shortLength) << payload;
-	return out;
+	inStream << EndianSwapShort(shortLength) << payload;
 }
 TagPayloadString * TagPayloadString::clone(){
 	return new TagPayloadString(payload);
@@ -272,14 +258,11 @@ string TagPayloadList::getDisplayString(){
 	ss >> out;
 	return out;
 }
-iostream TagPayloadList::getStorageBytes(){
-	stringstream out;
-	out << ((unsigned char) type) << EndianSwapInt((int) payload.size());
-
+void TagPayloadList::getStorageBytes(iostream& inStream){
+	inStream << ((unsigned char) type) << EndianSwapInt((int) payload.size());
 	for(vector<TagPayload*>::iterator it = payload.begin(); it != payload.end(); ++it) {
-		out << ((*it)->getStorageBytes()).rdbuf();
+		(*it)->getStorageBytes(inStream);
 	}
-	return out;
 }
 void TagPayloadList::addManyPayloads(vector<TagPayload*> inVector){
 	for(vector<TagPayload*>::iterator it = inVector.begin(); it != inVector.end(); ++it) {
@@ -320,13 +303,11 @@ string TagPayloadIntArray::getDisplayString(){
 	OutStream >> out;
 	return out;
 }
-iostream TagPayloadIntArray::getStorageBytes(){
-	stringstream out;
-	out << EndianSwapInt(length);
+void TagPayloadIntArray::getStorageBytes(iostream& inStream){
+	inStream << EndianSwapInt(length);
 	for(int i = 0; i < length; i++){
-		out << EndianSwapInt(payload[i]);
+		inStream << EndianSwapInt(payload[i]);
 	}
-	return out;
 }
 TagPayloadIntArray * TagPayloadIntArray::clone(){
 	int newLength = length;
@@ -345,10 +326,6 @@ TagPayloadIntArray * TagPayloadIntArray::clone(){
 NBTTag::NBTTag(istream& inStream) :
 		TagType(static_cast<TAG_TypeID>(inStream.get())), name(inStream)	// This confuses me...
 {
-//	char inType;
-//	inStream >> inType;
-//	TagType = static_cast<TAG_TypeID>(inType);
-//	name = TagPayloadString(inStream);
 	Payload = getPayloadFromStream(TagType,inStream);
 }
 TagPayloadString NBTTag::nameClone(){
@@ -361,10 +338,10 @@ TagPayloadString NBTTag::nameClone(){
 string NBTTag::getDisplayString(){
 	return (TAGTypeToString(TagType) + " called \"" + name.getDisplayString() + "\" {\n" + Payload->getDisplayString() + "}\n");
 }
-iostream NBTTag::getStorageBytes(){
-	stringstream out;
-	out << ( (unsigned short) TagType) << (name.getStorageBytes()).rdbuf() << (Payload->getStorageBytes()).rdbuf();
-	return out;
+void NBTTag::getStorageBytes(iostream& inStream){
+	inStream << ( (unsigned short) TagType);
+	name.getStorageBytes(inStream);
+	Payload->getStorageBytes(inStream);
 }
 
 
@@ -389,12 +366,10 @@ string TagPayloadCompound::getDisplayString(){
 	ss >> out;
 	return out;
 }
-iostream TagPayloadCompound::getStorageBytes(){
-	stringstream out;
+void TagPayloadCompound::getStorageBytes(iostream& inStream){
 	for(vector<NBTTag>::iterator it = payload.begin(); it != payload.end(); ++it) {
-		out << (it->getStorageBytes()).rdbuf();
+		it->getStorageBytes(inStream);
 	}
-	out << '0'; // TAG_End
-	return out;
+	inStream << '0'; // TAG_End
 }
 
