@@ -31,11 +31,12 @@ void TagPayloadByte::getStorageBytes(iostream& inStream){
 	inStream << payload;
 	//return out;
 }
-
 TagPayloadByte * TagPayloadByte::clone(){
 	return new TagPayloadByte(payload);
 }
+TagPayloadByte::~TagPayloadByte(){
 
+}
 
 
 
@@ -62,6 +63,10 @@ void TagPayloadShort::getStorageBytes(iostream& inStream){
 TagPayloadShort * TagPayloadShort::clone(){
 	return new TagPayloadShort(payload);
 }
+TagPayloadShort::~TagPayloadShort(){
+
+}
+
 
 
 
@@ -85,6 +90,9 @@ void TagPayloadInt::getStorageBytes(iostream& inStream){
 }
 TagPayloadInt * TagPayloadInt::clone(){
 	return new TagPayloadInt(payload);
+}
+TagPayloadInt::~TagPayloadInt(){
+
 }
 
 
@@ -111,6 +119,9 @@ void TagPayloadLong::getStorageBytes(iostream& inStream){
 TagPayloadLong * TagPayloadLong::clone(){
 	return new TagPayloadLong(payload);
 }
+TagPayloadLong::~TagPayloadLong(){
+
+}
 
 
 
@@ -134,6 +145,9 @@ void TagPayloadFloat::getStorageBytes(iostream& inStream){
 }
 TagPayloadFloat * TagPayloadFloat::clone(){
 	return new TagPayloadFloat(payload);
+}
+TagPayloadFloat::~TagPayloadFloat(){
+
 }
 
 
@@ -159,6 +173,9 @@ void TagPayloadDouble::getStorageBytes(iostream& inStream){
 }
 TagPayloadDouble * TagPayloadDouble::clone(){
 	return new TagPayloadDouble(payload);
+}
+TagPayloadDouble::~TagPayloadDouble(){
+
 }
 
 
@@ -284,6 +301,10 @@ TagPayloadList * TagPayloadList::clone(){
 	out->addManyPayloads(payload);
 	return out;
 }
+TagPayloadList::~TagPayloadList(){
+
+}
+
 
 
 
@@ -400,6 +421,9 @@ TagPayloadCompound * TagPayloadCompound::clone(){
 	TagPayloadCompound* out = new TagPayloadCompound;
 	out->addManyTags(payload);
 	return out;
+}
+TagPayloadCompound::~TagPayloadCompound(){
+
 }
 
 
