@@ -8,44 +8,16 @@ using namespace std;
 enum TAG_TypeID {TAG_End, TAG_Byte, TAG_Short, TAG_Int, TAG_Long, TAG_Float, TAG_Double,
 	TAG_Byte_Array, TAG_String, TAG_List, TAG_Compound, TAG_IntArray };
 
-string TAGTypeToString(TAG_TypeID inID){
-	string out = "UNKNOWN";
-	switch (inID)
-	{
-	case TAG_End: out = "TAG_End";
-	break;
-	case TAG_Byte: out = "TAG_Byte";
-	break;
-	case TAG_Short: out = "TAG_Short";
-	break;
-	case TAG_Int: out = "TAG_Int";
-	break;
-	case TAG_Long: out = "TAG_Long";
-	break;
-	case TAG_Float: out = "TAG_Float";
-	break;
-	case TAG_Double: out = "TAG_Double";
-	break;
-	case TAG_Byte_Array: out = "TAG_Byte_Array";
-	break;
-	case TAG_String: out = "TAG_String";
-	break;
-	case TAG_List: out = "TAG_List";
-	break;
-	case TAG_Compound: out = "TAG_Compound";
-	break;
-	case TAG_IntArray: out = "TAG_IntArray";
-	break;
-	}
-	return out;
-}
+string TAGTypeToString(TAG_TypeID inID);
 
 class TagPayload {
 public:
 	virtual string getDisplayString() = 0;	// TODO Need to check how polymorphic inheritance works
-	virtual iostream getStorageBytes() = 0;
-	virtual ~TagPayload();					// I hope this is correct...
+	virtual void getStorageBytes(iostream& inStream) = 0;
 	virtual TagPayload * clone() = 0;
+	virtual ~TagPayload() {					// I hope this is correct...
+
+	}
 };
 
 class TagPayloadByte : public TagPayload {
@@ -56,7 +28,8 @@ public:
 	TagPayloadByte(istream& inStream);
 	TagPayloadByte * clone();
 	string getDisplayString();
-	iostream getStorageBytes();
+	void getStorageBytes(iostream& inStream);
+	~TagPayloadByte();
 };
 
 class TagPayloadShort : public TagPayload {
@@ -67,7 +40,8 @@ public:
 	TagPayloadShort(istream& inStream);
 	TagPayloadShort * clone();
 	string getDisplayString();
-	iostream getStorageBytes();
+	void getStorageBytes(iostream& inStream);
+	~TagPayloadShort();
 };
 
 class TagPayloadInt : public TagPayload {
@@ -78,7 +52,8 @@ public:
 	TagPayloadInt(istream& inStream);
 	TagPayloadInt * clone();
 	string getDisplayString();
-	iostream getStorageBytes();
+	void getStorageBytes(iostream& inStream);
+	~TagPayloadInt();
 };
 
 class TagPayloadLong : public TagPayload {
@@ -89,7 +64,8 @@ public:
 	TagPayloadLong(istream& inStream);
 	TagPayloadLong * clone();
 	string getDisplayString();
-	iostream getStorageBytes();
+	void getStorageBytes(iostream& inStream);
+	~TagPayloadLong();
 };
 
 class TagPayloadFloat : public TagPayload {
@@ -100,7 +76,8 @@ public:
 	TagPayloadFloat(istream& inStream);
 	TagPayloadFloat * clone();
 	string getDisplayString();
-	iostream getStorageBytes();
+	void getStorageBytes(iostream& inStream);
+	~TagPayloadFloat();
 };
 
 class TagPayloadDouble : public TagPayload {
@@ -111,7 +88,8 @@ public:
 	TagPayloadDouble(istream& inStream);
 	TagPayloadDouble * clone();
 	string getDisplayString();
-	iostream getStorageBytes();
+	void getStorageBytes(iostream& inStream);
+	~TagPayloadDouble();
 };
 
 class TagPayloadByteArray : public TagPayload {
@@ -123,7 +101,7 @@ public:
 	TagPayloadByteArray(istream& inStream);
 	TagPayloadByteArray * clone();
 	string getDisplayString();
-	iostream getStorageBytes();
+	void getStorageBytes(iostream& inStream);
 	~TagPayloadByteArray();
 };
 
@@ -135,7 +113,8 @@ public:
 	TagPayloadString(istream& inStream);
 	TagPayloadString * clone();
 	string getDisplayString();
-	iostream getStorageBytes();
+	void getStorageBytes(iostream& inStream);
+	~TagPayloadString();
 };
 
 class TagPayloadList : public TagPayload {
@@ -149,7 +128,8 @@ public:
 	TagPayloadList(istream& inStream);
 	TagPayloadList * clone();
 	string getDisplayString();
-	iostream getStorageBytes();
+	void getStorageBytes(iostream& inStream);
+	~TagPayloadList();
 };
 
 class TagPayloadIntArray : public TagPayload {
@@ -161,7 +141,8 @@ public:
 	TagPayloadIntArray(istream& inStream);
 	TagPayloadIntArray * clone();
 	string getDisplayString();
-	iostream getStorageBytes();
+	void getStorageBytes(iostream& inStream);
+	~TagPayloadIntArray();
 };
 
 class NBTTag {
@@ -174,7 +155,8 @@ public:
 	//NBTTag(NBTTag& inTag);
 	TagPayloadString nameClone();
 	string getDisplayString();
-	iostream getStorageBytes();
+	void getStorageBytes(iostream& inStream);
+	~NBTTag();
 };
 
 
@@ -186,45 +168,11 @@ public:
 	TagPayloadCompound(istream& inStream);
 	TagPayloadCompound * clone();
 	string getDisplayString();
-	iostream getStorageBytes();
+	void getStorageBytes(iostream& inStream);
+	~TagPayloadCompound();
 };
 
 // I DO know that the rest IS necessary.
 
-TagPayload * getPayloadFromStream(TAG_TypeID inType, istream& inStream){		// TODO check whether the polymorphism works here
-																			 //or if pointers are needed...
-		switch (inType)
-		{
-		case TAG_End: return (TagPayload *) NULL;
-		break;
-		case TAG_Byte: return new TagPayloadByte(inStream);
-		break;
-		case TAG_Short: return new TagPayloadShort(inStream);
-		break;
-		case TAG_Int: return new TagPayloadInt(inStream);
-		break;
-		case TAG_Long: return new TagPayloadLong(inStream);
-		break;
-		case TAG_Float: return new TagPayloadFloat(inStream);
-		break;
-		case TAG_Double: return new TagPayloadDouble(inStream);
-		break;
-		case TAG_Byte_Array: return new TagPayloadByteArray(inStream);
-		break;
-		case TAG_String: return new TagPayloadString(inStream);
-		break;
-		case TAG_List: return new TagPayloadList(inStream);
-		break;
-		case TAG_Compound: return new TagPayloadCompound(inStream);
-		break;
-		case TAG_IntArray: return new TagPayloadIntArray(inStream);
-		break;
-		}
-		return (TagPayload *) NULL;
-}
-
-TagPayload * getPayloadFromStream(int inType, istream& inStream){
-	TAG_TypeID changed = static_cast<TAG_TypeID>(inType);
-	return getPayloadFromStream(changed, inStream);
-}
-
+TagPayload * getPayloadFromStream(TAG_TypeID inType, istream& inStream);
+TagPayload * getPayloadFromStream(int inType, istream& inStream);
