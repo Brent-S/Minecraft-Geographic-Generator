@@ -27,6 +27,13 @@ iostream TagPayloadByte::getStorageBytes(){
 	return out;
 }
 
+TagPayloadByte * TagPayloadByte::clone(){
+	return new TagPayloadByte(payload);
+}
+
+
+
+
 TagPayloadShort::TagPayloadShort(short inShort){
 	payload = inShort;
 }
@@ -48,6 +55,12 @@ iostream TagPayloadShort::getStorageBytes(){
 	return out;
 }
 
+TagPayloadShort * TagPayloadShort::clone(){
+	return new TagPayloadShort(payload);
+}
+
+
+
 TagPayloadInt::TagPayloadInt(int inInt){
 	payload = inInt;
 }
@@ -68,6 +81,12 @@ iostream TagPayloadInt::getStorageBytes(){
 	out << EndianSwapInt(payload);
 	return out;
 }
+TagPayloadInt * TagPayloadInt::clone(){
+	return new TagPayloadInt(payload);
+}
+
+
+
 
 TagPayloadLong::TagPayloadLong(long inLong){
 	payload = inLong;
@@ -89,6 +108,11 @@ iostream TagPayloadLong::getStorageBytes(){
 	out << EndianSwapLong(payload);
 	return out;
 }
+TagPayloadLong * TagPayloadLong::clone(){
+	return new TagPayloadLong(payload);
+}
+
+
 
 TagPayloadFloat::TagPayloadFloat(float inFloat){
 	payload = inFloat;
@@ -110,6 +134,12 @@ iostream TagPayloadFloat::getStorageBytes(){
 	out << EndianSwapFloat(payload);
 	return out;
 }
+TagPayloadFloat * TagPayloadFloat::clone(){
+	return new TagPayloadFloat(payload);
+}
+
+
+
 
 TagPayloadDouble::TagPayloadDouble(double inDouble){
 	payload = inDouble;
@@ -131,6 +161,10 @@ iostream TagPayloadDouble::getStorageBytes(){
 	out << EndianSwapDouble(payload);
 	return out;
 }
+TagPayloadDouble * TagPayloadDouble::clone(){
+	return new TagPayloadDouble(payload);
+}
+
 
 
 
@@ -169,6 +203,19 @@ iostream TagPayloadByteArray::getStorageBytes(){
 TagPayloadByteArray::~TagPayloadByteArray(){
 	delete [] payload;	// I think this is right...
 }
+TagPayloadByteArray * TagPayloadByteArray::clone(){
+	int newLength = length;
+	char * newArray = new char[length];
+	for(int i = 0; i < length; i++){
+		newArray[i] = payload[i];
+	}
+	TagPayloadByteArray* out = new TagPayloadByteArray(newArray, newLength);
+	delete [] newArray; // TODO check this
+	return out;
+}
+
+
+
 
 TagPayloadString::TagPayloadString(string inString){
 	payload = inString;
@@ -191,10 +238,14 @@ iostream TagPayloadString::getStorageBytes(){
 	out << EndianSwapShort(shortLength) << payload;
 	return out;
 }
+TagPayloadString * TagPayloadString::clone(){
+	return new TagPayloadString(payload);
+}
 
 
 
-TagPayloadList::TagPayloadList(TAG_TypeID inType){
+
+TagPayloadList::TagPayloadList(TAG_TypeID inType){ // I hope the vector gets correctly initialised...
 	type = inType;
 }
 void TagPayloadList::addPayload(TagPayload* inPayload){
@@ -228,6 +279,16 @@ iostream TagPayloadList::getStorageBytes(){
 	for(vector<TagPayload*>::iterator it = payload.begin(); it != payload.end(); ++it) {
 		out << ((*it)->getStorageBytes()).rdbuf();
 	}
+	return out;
+}
+void TagPayloadList::addManyPayloads(vector<TagPayload*> inVector){
+	for(vector<TagPayload*>::iterator it = inVector.begin(); it != inVector.end(); ++it) {
+		payload.push_back((*it)->clone());
+	}
+}
+TagPayloadList * TagPayloadList::clone(){
+	TagPayloadList* out = new TagPayloadList(type);
+	out->addManyPayloads(payload);
 	return out;
 }
 
@@ -267,6 +328,18 @@ iostream TagPayloadIntArray::getStorageBytes(){
 	}
 	return out;
 }
+TagPayloadIntArray * TagPayloadIntArray::clone(){
+	int newLength = length;
+	int * newArray = new int[length];
+	for(int i = 0; i < length; i++){
+		newArray[i] = payload[i];
+	}
+	TagPayloadIntArray* out = new TagPayloadIntArray(newArray, newLength);
+	delete [] newArray; // TODO check this
+	return out;
+}
+
+
 
 
 NBTTag::NBTTag(istream& inStream) :
@@ -278,6 +351,13 @@ NBTTag::NBTTag(istream& inStream) :
 //	name = TagPayloadString(inStream);
 	Payload = getPayloadFromStream(TagType,inStream);
 }
+TagPayloadString NBTTag::nameClone(){
+	return *(name.clone());
+}
+//NBTTag::NBTTag(NBTTag& inTag) : name(inTag.nameClone()){ // this looks odd to me...
+//	// name = inTag.nameClone();
+//	Payload = inTag.Payload->clone(); // TODO Check this
+//}
 string NBTTag::getDisplayString(){
 	return (TAGTypeToString(TagType) + " called \"" + name.getDisplayString() + "\" {\n" + Payload->getDisplayString() + "}\n");
 }
@@ -303,15 +383,15 @@ TagPayloadCompound::TagPayloadCompound(istream& inStream){
 string TagPayloadCompound::getDisplayString(){
 	stringstream ss;
 	string out;
-	for(vector<TagPayload>::iterator it = payload.begin(); it != payload.end(); ++it) {
-		ss <<"(" << it->getDisplayString() << ")\t";
+	for(vector<NBTTag>::iterator it = payload.begin(); it != payload.end(); ++it) {
+		ss <<"(" << (*it).getDisplayString() << ")\t";
 	}
 	ss >> out;
 	return out;
 }
 iostream TagPayloadCompound::getStorageBytes(){
 	stringstream out;
-	for(vector<TagPayload>::iterator it = payload.begin(); it != payload.end(); ++it) {
+	for(vector<NBTTag>::iterator it = payload.begin(); it != payload.end(); ++it) {
 		out << (it->getStorageBytes()).rdbuf();
 	}
 	out << '0'; // TAG_End

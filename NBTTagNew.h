@@ -42,9 +42,10 @@ string TAGTypeToString(TAG_TypeID inID){
 
 class TagPayload {
 public:
-	virtual string getDisplayString() =0;	// TODO Need to check how polymorphic inheritance works
-	virtual iostream getStorageBytes() =0;
+	virtual string getDisplayString() = 0;	// TODO Need to check how polymorphic inheritance works
+	virtual iostream getStorageBytes() = 0;
 	virtual ~TagPayload();					// I hope this is correct...
+	virtual TagPayload * clone() = 0;
 };
 
 class TagPayloadByte : public TagPayload {
@@ -53,6 +54,7 @@ private:
 public:
 	TagPayloadByte(char inChar);
 	TagPayloadByte(istream& inStream);
+	TagPayloadByte * clone();
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -63,6 +65,7 @@ private:
 public:
 	TagPayloadShort(short inShort);
 	TagPayloadShort(istream& inStream);
+	TagPayloadShort * clone();
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -73,6 +76,7 @@ private:
 public:
 	TagPayloadInt(int inInt);
 	TagPayloadInt(istream& inStream);
+	TagPayloadInt * clone();
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -83,6 +87,7 @@ private:
 public:
 	TagPayloadLong(long inLong);
 	TagPayloadLong(istream& inStream);
+	TagPayloadLong * clone();
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -93,6 +98,7 @@ private:
 public:
 	TagPayloadFloat(float inFloat);
 	TagPayloadFloat(istream& inStream);
+	TagPayloadFloat * clone();
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -103,6 +109,7 @@ private:
 public:
 	TagPayloadDouble(double inDouble);
 	TagPayloadDouble(istream& inStream);
+	TagPayloadDouble * clone();
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -114,6 +121,7 @@ private:
 public:
 	TagPayloadByteArray(char* inArray, int inLength);
 	TagPayloadByteArray(istream& inStream);
+	TagPayloadByteArray * clone();
 	string getDisplayString();
 	iostream getStorageBytes();
 	~TagPayloadByteArray();
@@ -125,6 +133,7 @@ private:
 public:
 	TagPayloadString(string inString);
 	TagPayloadString(istream& inStream);
+	TagPayloadString * clone();
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -136,7 +145,9 @@ private:
 public:
 	TagPayloadList(TAG_TypeID inType);
 	void addPayload(TagPayload* inPayload);
+	void addManyPayloads(vector<TagPayload*> inVector);
 	TagPayloadList(istream& inStream);
+	TagPayloadList * clone();
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -148,6 +159,7 @@ private:
 public:
 	TagPayloadIntArray(int* inArray, int inLength);
 	TagPayloadIntArray(istream& inStream);
+	TagPayloadIntArray * clone();
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -159,6 +171,8 @@ private:
 	TagPayload* Payload; // Need to be careful about this.
 public:
 	NBTTag(istream& inStream);
+	//NBTTag(NBTTag& inTag);
+	TagPayloadString nameClone();
 	string getDisplayString();
 	iostream getStorageBytes();
 };
@@ -170,6 +184,7 @@ private:
 public:
 	void addTag(NBTTag inTag);
 	TagPayloadCompound(istream& inStream);
+	TagPayloadCompound * clone();
 	string getDisplayString();
 	iostream getStorageBytes();
 };
