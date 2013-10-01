@@ -87,7 +87,7 @@ Image ReadInputImage(){
 }
 
 double ReadScale(){
-	double output;
+	double output = 1;
 	ifstream ConfigFile("ImageConverter.conf");
 	string nxtLine;
 	getline(ConfigFile,nxtLine);
@@ -127,7 +127,7 @@ int DoPictureStuff( int /*argc*/, char ** argv) {
 			picture.resize(Geometry(NewCols,NewRows));
 			cols = picture.columns();
 			rows = picture.rows();
-			picture.write("test.png");
+			picture.write("Image as used.png");
 		}
 
 		const PixelPacket *pixels = picture.getConstPixels(0,0,cols,rows);
@@ -174,9 +174,11 @@ int main( int /*argc*/, char ** argv) {
 	if(inputNum == 1){
 		return DoPictureStuff(0, argv);  // dunno what the call really is...
 	} else {
+		cout << "Opening file...";
 		ifstream inFile("hello_world.nbt");
+		cout << " Done.\nConstructing Tags...";
 		NBTTag rootTag (inFile);
-		cout << rootTag.getDisplayString();
+		cout <<"Done.\n \n" << rootTag.getDisplayString();
 	}
 	return 0;
 }

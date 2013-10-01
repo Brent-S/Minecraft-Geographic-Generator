@@ -1,13 +1,18 @@
+FLAGS= -Wall
+MAGICK1=`Magick++-config --cxxflags --cppflags`
+MAGICK2=`Magick++-config --ldflags --libs`
+
+
 all: run
 
-run: ColourRangeToBlock.o NBTTagNew.o
-	g++ `Magick++-config --cxxflags --cppflags` -o run ImageConverter.cpp ColourRangeToBlock.o NBTTagNew.o `Magick++-config --ldflags --libs`
+run: ColourRangeToBlock.o NBTTagNew.o ImageConverter.cpp
+	g++ $(MAGICK1) $(FLAGS) -o run ImageConverter.cpp ColourRangeToBlock.o NBTTagNew.o $(MAGICK2)
 
 ColourRangeToBlock.o: ColourRangeToBlock.cpp
-	g++ -c ColourRangeToBlock.cpp
+	g++ -c $(FLAGS) ColourRangeToBlock.cpp
 
 NBTTagNew.o: NBTTagNew.cpp
-	g++ -c NBTTagNew.cpp
+	g++ -c $(FLAGS) NBTTagNew.cpp
 
 clean:
 	rm -rf *o run
