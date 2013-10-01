@@ -105,13 +105,13 @@ double ReadScale(){
 	return output;
 }
 
-int DoPictureStuff( int /*argc*/, char ** argv) {
+int DoPictureStuff() {
 
 	// Reads in colour definitions from ImageConverter.conf and prints to standard out a
 	// tab-delimited list of comma-separated (BlockID,DamageValue) pairs, with a newline
 	// for each row of pixels.
 
-	InitializeMagick(*argv);
+	InitializeMagick(NULL);
 	try {
 		vector<ColourRangeToBlock> BlockDefs = ReadBlockDefs();
 		Image picture = ReadInputImage();
@@ -166,19 +166,21 @@ int DoPictureStuff( int /*argc*/, char ** argv) {
 }
 
 
-int main( int /*argc*/, char ** argv) {
+int main() {
 	cout << "Enter 1 to do image stuff, or 2 to read test nbt file:\n";
 	int inputNum;
 	cin >> inputNum;
 
 	if(inputNum == 1){
-		return DoPictureStuff(0, argv);  // dunno what the call really is...
+		return DoPictureStuff();
 	} else {
 		cout << "Opening file...";
 		ifstream inFile("hello_world.nbt");
-		cout << " Done.\nConstructing Tags...";
+		cout << " Done." <<"\n" << "Constructing Tags...";
+		cout.flush();
 		NBTTag rootTag (inFile);
 		cout <<"Done.\n \n" << rootTag.getDisplayString();
+		cout.flush();
 	}
 	return 0;
 }

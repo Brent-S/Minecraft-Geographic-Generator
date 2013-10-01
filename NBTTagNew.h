@@ -174,4 +174,13 @@ public:
 // I DO know that the rest IS necessary.
 
 TagPayload * getPayloadFromStream(TAG_TypeID inType, istream& inStream);
-//TagPayload * getPayloadFromStream(int inType, istream& inStream);
+short getSwappedShortFromStream(istream& inStream);
+int getSwappedIntFromStream(istream& inStream);
+long getSwappedLongFromStream(istream& inStream);
+float getSwappedFloatFromStream(istream& inStream);
+double getSwappedDoubleFromStream(istream& inStream);
+string getStringFromStream(istream& inStream, int length);
+
+
+
+
