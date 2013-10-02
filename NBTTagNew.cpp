@@ -361,7 +361,7 @@ TagPayloadString NBTTag::nameClone(){
 string NBTTag::getDisplayString(){
 	string nameString = name.getDisplayString();
 	string payloadString = (*Payload).getDisplayString();
-	string out = (TAGTypeToString(TagType) + " named \"" + nameString + "\"\n{" + payloadString + "}\n");
+	string out = (TAGTypeToString(TagType) + " named \"" + nameString + "\"{\n" + payloadString + "}\n");
 	return out;
 }
 void NBTTag::getStorageBytes(iostream& inStream){
@@ -393,7 +393,7 @@ TagPayloadCompound::TagPayloadCompound(){
 string TagPayloadCompound::getDisplayString(){
 	string out;
 	for(vector<NBTTag>::iterator it = payload.begin(); it != payload.end(); it++) { // TODO  ++it?
-		out += string("(") + (*it).getDisplayString() + ")\t";
+		out += string("(") + (*it).getDisplayString() + ")\n";
 	}
 	return out;
 }

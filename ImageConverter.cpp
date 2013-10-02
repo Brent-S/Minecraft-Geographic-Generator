@@ -9,6 +9,7 @@
 #include "ColourRangeToBlock.h"
 #include "NBTTagNew.h"
 #include <bitset> //TODO temp
+#include "gzipReader.h"
 
 using namespace std;
 using namespace Magick;
@@ -177,13 +178,13 @@ void stepThroughStreamTemp(istream& inStream){
 
 
 int main() {
-	cout << "Enter 1 to do image stuff, or 2 to read test nbt file:\n";
+	cout << "Enter 1 to do image stuff, 2 to read test nbt file, or 3 to read bigger test file:\n";
 	int inputNum;
 	cin >> inputNum;
 
 	if(inputNum == 1){
 		DoPictureStuff();
-	} else {
+	} else if (inputNum == 2) {
 		cout << "Opening file...";
 		ifstream inFile("hello_world.nbt");
 		cout << " Done." <<"\n" << "Constructing Tags...";
@@ -193,32 +194,36 @@ int main() {
 		cout <<"Done.\n \n" << rootTag.getDisplayString();
 		cout.flush();
 
-		cout << "Writing file out...";
-		cout.flush();
-		stringstream tempStream;
-		rootTag.getStorageBytes(tempStream);
-		ofstream outFile("NBTout.nbt");
-		outFile << tempStream.rdbuf();
-		outFile.close();
-		cout << "Done." << endl << endl;
-
-		ifstream temp1("hello_world.nbt");
-		cout << "original ";
-		stepThroughStreamTemp(temp1);
-		ifstream temp2("NBTout.nbt");
-		cout << "written  ";
-		stepThroughStreamTemp(temp2);
-		temp1.close();
-		temp2.close();
-
-		cout << "Opening file...";
-		ifstream inFile2("NBTout.nbt");
-		cout << " Done." <<"\n" << "Constructing Tags...";
-		cout.flush();
-		NBTTag rootTag2 (inFile2);
-		inFile.close();
-		cout <<"Done.\n \n" << rootTag2.getDisplayString();
-		cout.flush();
+//		cout << "Writing file out...";
+//		cout.flush();
+//		stringstream tempStream;
+//		rootTag.getStorageBytes(tempStream);
+//		ofstream outFile("NBTout.nbt");
+//		outFile << tempStream.rdbuf();
+//		outFile.close();
+//		cout << "Done." << endl << endl;
+//
+//		ifstream temp1("hello_world.nbt");
+//		cout << "original ";
+//		stepThroughStreamTemp(temp1);
+//		ifstream temp2("NBTout.nbt");
+//		cout << "written  ";
+//		stepThroughStreamTemp(temp2);
+//		temp1.close();
+//		temp2.close();
+//
+//		cout << "Opening file...";
+//		ifstream inFile2("NBTout.nbt");
+//		cout << " Done." <<"\n" << "Constructing Tags...";
+//		cout.flush();
+//		NBTTag rootTag2 (inFile2);
+//		inFile.close();
+//		cout <<"Done.\n \n" << rootTag2.getDisplayString();
+//		cout.flush();
+	} else {
+//	    filtering_streambuf<input> in;
+//	    in.push(gzip_decompressor());
+//	    in.push(file);
 	}
 	cout << "Program execution completed successfully." << endl;
 	return 0;
