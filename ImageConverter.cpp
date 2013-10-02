@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include "ColourRangeToBlock.h"
 #include "NBTTagNew.h"
+#include <bitset> //TODO temp
 
 using namespace std;
 using namespace Magick;
@@ -165,6 +166,15 @@ int DoPictureStuff() {
 	return 0;
 }
 
+void stepThroughStreamTemp(istream& inStream){
+	while(inStream.good()){
+		unsigned int temp = inStream.get();
+		//bitset<16> temp2(temp);
+		cout << temp << " ";// << temp2 << " ";
+	}
+	cout << "End." << endl;
+}
+
 
 int main() {
 	cout << "Enter 1 to do image stuff, or 2 to read test nbt file:\n";
@@ -172,7 +182,7 @@ int main() {
 	cin >> inputNum;
 
 	if(inputNum == 1){
-		return DoPictureStuff();
+		DoPictureStuff();
 	} else {
 		cout << "Opening file...";
 		ifstream inFile("hello_world.nbt");
@@ -191,6 +201,15 @@ int main() {
 		outFile << tempStream.rdbuf();
 		outFile.close();
 		cout << "Done." << endl << endl;
+
+		ifstream temp1("hello_world.nbt");
+		cout << "original ";
+		stepThroughStreamTemp(temp1);
+		ifstream temp2("NBTout.nbt");
+		cout << "written  ";
+		stepThroughStreamTemp(temp2);
+		temp1.close();
+		temp2.close();
 
 		cout << "Opening file...";
 		ifstream inFile2("NBTout.nbt");

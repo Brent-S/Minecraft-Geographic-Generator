@@ -19,7 +19,7 @@ TagPayloadByte::TagPayloadByte(char inChar){
 	payload = inChar;
 }
 TagPayloadByte::TagPayloadByte(istream& inStream): payload(inStream.get()){
-	//inStream >> payload;
+
 }
 string TagPayloadByte::getDisplayString(){
 	stringstream ss;
@@ -57,7 +57,7 @@ string TagPayloadShort::getDisplayString(){
 	return out;
 }
 void TagPayloadShort::getStorageBytes(iostream& inStream){
-	inStream << EndianSwapShort(payload);
+	writeSwappedShortToStream(payload, inStream);
 	inStream.flush();
 }
 
@@ -85,7 +85,7 @@ string TagPayloadInt::getDisplayString(){
 	return out;
 }
 void TagPayloadInt::getStorageBytes(iostream& inStream){
-	inStream << EndianSwapInt(payload);
+	writeSwappedIntToStream(payload, inStream);
 	inStream.flush();
 }
 TagPayloadInt * TagPayloadInt::clone(){
@@ -112,7 +112,7 @@ string TagPayloadLong::getDisplayString(){
 	return out;
 }
 void TagPayloadLong::getStorageBytes(iostream& inStream){
-	inStream << EndianSwapLong(payload);
+	writeSwappedLongToStream(payload, inStream);
 }
 TagPayloadLong * TagPayloadLong::clone(){
 	return new TagPayloadLong(payload);
@@ -137,7 +137,7 @@ string TagPayloadFloat::getDisplayString(){
 	return out;
 }
 void TagPayloadFloat::getStorageBytes(iostream& inStream){
-	inStream << EndianSwapFloat(payload);
+	writeSwappedFloatToStream(payload, inStream);
 	inStream.flush();
 }
 TagPayloadFloat * TagPayloadFloat::clone(){
@@ -164,7 +164,7 @@ string TagPayloadDouble::getDisplayString(){
 	return out;
 }
 void TagPayloadDouble::getStorageBytes(iostream& inStream){
-	inStream << EndianSwapDouble(payload);
+	writeSwappedDoubleToStream(payload, inStream);
 	inStream.flush();
 }
 TagPayloadDouble * TagPayloadDouble::clone(){
@@ -237,8 +237,8 @@ string TagPayloadString::getDisplayString(void){
 	return payload;
 }
 void TagPayloadString::getStorageBytes(iostream& inStream){
-	unsigned short shortLength = (unsigned short) payload.size(); // This is right (I think) due to the weirdness of NBT
-	inStream << EndianSwapShort(shortLength) << payload;
+	writeSwappedShortToStream((unsigned short) payload.size(), inStream);
+	inStream << payload;
 	inStream.flush();
 }
 TagPayloadString * TagPayloadString::clone(){
@@ -276,7 +276,8 @@ string TagPayloadList::getDisplayString(){
 	return out;
 }
 void TagPayloadList::getStorageBytes(iostream& inStream){
-	inStream << ((unsigned char) type) << EndianSwapInt((int) payload.size());
+	inStream << getCharFromTag(type);
+	writeSwappedIntToStream((int) payload.size(), inStream);
 	for(vector<TagPayload*>::iterator it = payload.begin(); it != payload.end(); ++it) {
 		(*it)->getStorageBytes(inStream);
 	}
@@ -325,7 +326,7 @@ string TagPayloadIntArray::getDisplayString(){
 void TagPayloadIntArray::getStorageBytes(iostream& inStream){
 	inStream << EndianSwapInt(length);
 	for(int i = 0; i < length; i++){
-		inStream << EndianSwapInt(payload[i]);
+		writeSwappedIntToStream(payload[i], inStream);
 	}
 	inStream.flush();
 }
@@ -347,26 +348,24 @@ TagPayloadIntArray::~TagPayloadIntArray(){
 
 
 NBTTag::NBTTag(istream& inStream) :
-						TagType(static_cast<TAG_TypeID>(inStream.get())), name(inStream)	// This confuses me...
+								TagType(static_cast<TAG_TypeID>(inStream.get())), name(inStream)	// This confuses me...
 {
 	Payload = getPayloadFromStream(TagType,inStream);
-	//Payload = new TagPayloadString(inStream);
-	//cout << endl << "Constructed Tag " << TAGTypeToString(TagType) << endl;
+	string pause;
+	cout << "Pause" << endl;
+	cin >> pause;
 }
 TagPayloadString NBTTag::nameClone(){
 	return *(name.clone());
 }
 string NBTTag::getDisplayString(){
-	//cout << "Display Tag called" << endl;
 	string nameString = name.getDisplayString();
-	//cout << nameString << endl;
 	string payloadString = (*Payload).getDisplayString();
-	//cout << payloadString << endl;
 	string out = (TAGTypeToString(TagType) + " named \"" + nameString + "\"\n{" + payloadString + "}\n");
 	return out;
 }
 void NBTTag::getStorageBytes(iostream& inStream){
-	inStream << ( (unsigned short) TagType);
+	inStream << getCharFromTag(TagType);
 	name.getStorageBytes(inStream);
 	Payload->getStorageBytes(inStream);
 	inStream.flush();
@@ -392,26 +391,23 @@ TagPayloadCompound::TagPayloadCompound(){
 
 }
 string TagPayloadCompound::getDisplayString(){
-	//stringstream ss;
 	string out;
-	int i = 0; // TODO temp
 	for(vector<NBTTag>::iterator it = payload.begin(); it != payload.end(); it++) { // TODO  ++it?
-		//cout << "in loop at " << i << endl;
 		out += string("(") + (*it).getDisplayString() + ")\t";
-		i++;
 	}
-	//ss >> out;
 	return out;
 }
 void TagPayloadCompound::getStorageBytes(iostream& inStream){
 	for(vector<NBTTag>::iterator it = payload.begin(); it != payload.end(); it++) {
 		it->getStorageBytes(inStream);
 	}
-	inStream << '0'; // TAG_End
+	inStream << (unsigned char) 0; // TAG_End
 	inStream.flush();
 }
 void TagPayloadCompound::addManyTags(vector<NBTTag>& inVector){
-
+	for(vector<NBTTag>::iterator it = inVector.begin(); it != inVector.end(); it++) {
+		payload.push_back(*it);
+	}
 }
 
 TagPayloadCompound * TagPayloadCompound::clone(){
@@ -422,11 +418,6 @@ TagPayloadCompound * TagPayloadCompound::clone(){
 TagPayloadCompound::~TagPayloadCompound(){
 
 }
-
-
-
-
-
 
 
 
@@ -558,3 +549,70 @@ string TAGTypeToString(TAG_TypeID inID){
 	}
 	return out;
 }
+
+char getCharFromTag(TAG_TypeID inTag){
+	char out = -1;
+	switch (inTag)
+	{
+	case TAG_End: out = 0;
+	break;
+	case TAG_Byte: out = 1;
+	break;
+	case TAG_Short: out = 2;
+	break;
+	case TAG_Int: out = 3;
+	break;
+	case TAG_Long: out = 4;
+	break;
+	case TAG_Float: out = 5;
+	break;
+	case TAG_Double: out = 6;
+	break;
+	case TAG_Byte_Array: out = 7;
+	break;
+	case TAG_String: out = 8;
+	break;
+	case TAG_List: out = 9;
+	break;
+	case TAG_Compound: out = 10;
+	break;
+	case TAG_IntArray: out = 11;
+	break;
+	}
+	return out;
+}
+
+void writeSwappedShortToStream(short inShort, ostream& inStream){
+	char* lengthChars = (char*) &inShort;
+	inStream << (unsigned char)lengthChars[1] << (unsigned char)lengthChars[0];
+}
+void writeSwappedIntToStream(int inInt, ostream& inStream){
+	char* lengthChars = (char*) &inInt;
+	inStream << (unsigned char)lengthChars[3] << (unsigned char)lengthChars[2] << (unsigned char)lengthChars[1] <<
+			(unsigned char)lengthChars[0];
+}
+void writeSwappedLongToStream(long inLong, ostream& inStream){
+	char* lengthChars = (char*) &inLong;
+	inStream << (unsigned char)lengthChars[7] << (unsigned char)lengthChars[6] << (unsigned char)lengthChars[5] <<
+			(unsigned char)lengthChars[4] << (unsigned char)lengthChars[3] << (unsigned char)lengthChars[2]<<
+			(unsigned char)lengthChars[1] << (unsigned char)lengthChars[0];
+}
+void writeSwappedFloatToStream(float inFloat, ostream& inStream){
+	char* lengthChars = (char*) &inFloat;
+	inStream << (unsigned char)lengthChars[3] << (unsigned char)lengthChars[2] << (unsigned char)lengthChars[1] <<
+			(unsigned char)lengthChars[0];
+}
+void writeSwappedDoubleToStream(double inDouble, ostream& inStream){
+	char* lengthChars = (char*) &inDouble;
+	inStream << (unsigned char)lengthChars[7] << (unsigned char)lengthChars[6] << (unsigned char)lengthChars[5] <<
+			(unsigned char)lengthChars[4] << (unsigned char)lengthChars[3] << (unsigned char)lengthChars[2] <<
+			(unsigned char)lengthChars[1] << (unsigned char)lengthChars[0];
+}
+
+
+
+
+
+
+
+

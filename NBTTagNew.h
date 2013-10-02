@@ -179,6 +179,13 @@ long getSwappedLongFromStream(istream& inStream);
 float getSwappedFloatFromStream(istream& inStream);
 double getSwappedDoubleFromStream(istream& inStream);
 string getStringFromStream(istream& inStream, int length);
+char getCharFromTag(TAG_TypeID inTag);
+
+void writeSwappedShortToStream(short inShort, ostream& inStream);
+void writeSwappedIntToStream(int inInt, ostream& inStream);
+void writeSwappedLongToStream(long inLong, ostream& inStream);
+void writeSwappedFloatToStream(float inFloat, ostream& inStream);
+void writeSwappedDoubleToStream(double inDouble, ostream& inStream);
 
 
 
