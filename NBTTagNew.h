@@ -171,7 +171,6 @@ public:
 	~TagPayloadCompound();
 };
 
-// I DO know that the rest IS necessary.
 
 TagPayload * getPayloadFromStream(TAG_TypeID inType, istream& inStream);
 short getSwappedShortFromStream(istream& inStream);

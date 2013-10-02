@@ -27,7 +27,7 @@ string TagPayloadByte::getDisplayString(){
 	ss.flush();
 	string out;
 	ss >> out;
-	return out;	// TODO does this work reference wise?
+	return out;
 }
 void TagPayloadByte::getStorageBytes(iostream& inStream){
 	inStream << payload;
@@ -230,8 +230,10 @@ TagPayloadString::TagPayloadString(string inString){
 TagPayloadString::TagPayloadString(istream& inStream){
 	unsigned short length = getSwappedShortFromStream(inStream);
 	payload = getStringFromStream(inStream, length);
+	//cout << "String payload created with content :" << payload << endl;
 }
 string TagPayloadString::getDisplayString(void){
+	//cout << "TagPayload String display called" << endl;
 	return payload;
 }
 void TagPayloadString::getStorageBytes(iostream& inStream){
@@ -347,14 +349,21 @@ TagPayloadIntArray::~TagPayloadIntArray(){
 NBTTag::NBTTag(istream& inStream) :
 						TagType(static_cast<TAG_TypeID>(inStream.get())), name(inStream)	// This confuses me...
 {
-	//cout << "Constructing Tag" << endl;
 	Payload = getPayloadFromStream(TagType,inStream);
+	//Payload = new TagPayloadString(inStream);
+	//cout << endl << "Constructed Tag " << TAGTypeToString(TagType) << endl;
 }
 TagPayloadString NBTTag::nameClone(){
 	return *(name.clone());
 }
 string NBTTag::getDisplayString(){
-	return (TAGTypeToString(TagType) + " called \"" + name.getDisplayString() + "\" {\n" + Payload->getDisplayString() + "}\n");
+	//cout << "Display Tag called" << endl;
+	string nameString = name.getDisplayString();
+	//cout << nameString << endl;
+	string payloadString = (*Payload).getDisplayString();
+	//cout << payloadString << endl;
+	string out = (TAGTypeToString(TagType) + " named \"" + nameString + "\"\n{" + payloadString + "}\n");
+	return out;
 }
 void NBTTag::getStorageBytes(iostream& inStream){
 	inStream << ( (unsigned short) TagType);
@@ -363,7 +372,7 @@ void NBTTag::getStorageBytes(iostream& inStream){
 	inStream.flush();
 }
 NBTTag::~NBTTag(){
-	delete Payload; // I hope this is right...
+	//delete Payload; //TODO very confused now...
 }
 
 
@@ -383,16 +392,19 @@ TagPayloadCompound::TagPayloadCompound(){
 
 }
 string TagPayloadCompound::getDisplayString(){
-	stringstream ss;
+	//stringstream ss;
 	string out;
-	for(vector<NBTTag>::iterator it = payload.begin(); it != payload.end(); ++it) {
-		ss <<"(" << (*it).getDisplayString() << ")\t";
+	int i = 0; // TODO temp
+	for(vector<NBTTag>::iterator it = payload.begin(); it != payload.end(); it++) { // TODO  ++it?
+		//cout << "in loop at " << i << endl;
+		out += string("(") + (*it).getDisplayString() + ")\t";
+		i++;
 	}
-	ss >> out;
+	//ss >> out;
 	return out;
 }
 void TagPayloadCompound::getStorageBytes(iostream& inStream){
-	for(vector<NBTTag>::iterator it = payload.begin(); it != payload.end(); ++it) {
+	for(vector<NBTTag>::iterator it = payload.begin(); it != payload.end(); it++) {
 		it->getStorageBytes(inStream);
 	}
 	inStream << '0'; // TAG_End

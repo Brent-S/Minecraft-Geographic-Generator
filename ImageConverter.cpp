@@ -179,9 +179,29 @@ int main() {
 		cout << " Done." <<"\n" << "Constructing Tags...";
 		cout.flush();
 		NBTTag rootTag (inFile);
+		inFile.close();
 		cout <<"Done.\n \n" << rootTag.getDisplayString();
 		cout.flush();
+
+		cout << "Writing file out...";
+		cout.flush();
+		stringstream tempStream;
+		rootTag.getStorageBytes(tempStream);
+		ofstream outFile("NBTout.nbt");
+		outFile << tempStream.rdbuf();
+		outFile.close();
+		cout << "Done." << endl << endl;
+
+		cout << "Opening file...";
+		ifstream inFile2("NBTout.nbt");
+		cout << " Done." <<"\n" << "Constructing Tags...";
+		cout.flush();
+		NBTTag rootTag2 (inFile2);
+		inFile.close();
+		cout <<"Done.\n \n" << rootTag2.getDisplayString();
+		cout.flush();
 	}
+	cout << "Program execution completed successfully." << endl;
 	return 0;
 }
 
